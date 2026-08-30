@@ -3,9 +3,9 @@
 Safe integration experiments between DeepSeek Harness, MCP, ROS Noetic, and
 Agri_ROS.
 
-This repository starts with the stage 2 ROS baseline. It intentionally exposes
-only a hardware-free status service and does not launch navigation, SLAM,
-sensors, motor control, or actuators.
+Stages 2 and 3 establish a hardware-free ROS baseline and a local, read-only
+MCP bridge. They intentionally do not launch navigation, SLAM, sensors, motor
+control, or actuators.
 
 ## Stage 2 scope
 
@@ -37,6 +37,29 @@ roslaunch agri_stage2_demo status_demo.launch
 
 See [`catkin_ws/src/agri_stage2_demo/README.md`](catkin_ws/src/agri_stage2_demo/README.md)
 for the service contract and validation request.
+
+## Stage 3: local MCP bridge
+
+Stage 3 adds four allowlisted, read-only tools:
+
+- `ros_check_online`
+- `ros_list_nodes`
+- `ros_list_topics`
+- `get_robot_status`
+
+The MCP process uses Python 3.12, while a small subprocess adapter uses ROS
+Noetic's system Python 3.8. This keeps the two incompatible dependency sets
+separate.
+
+```bash
+cd agri_mcp_server
+uv sync --python 3.12 --locked
+./scripts/run_server.sh
+```
+
+The stage 3 endpoint is local-only: `http://127.0.0.1:8000/mcp`.
+See [`agri_mcp_server/README.md`](agri_mcp_server/README.md) for the complete
+architecture and test instructions.
 
 ## Safety
 

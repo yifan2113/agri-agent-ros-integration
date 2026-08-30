@@ -1,0 +1,24 @@
+[project]
+name = "agri-mcp-server"
+version = "0.1.0"
+description = "Safe MCP facade for ROS Noetic and Agri_ROS"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "mcp>=2,<3",
+]
+
+[project.scripts]
+agri-mcp-server = "agri_mcp_server.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agri_mcp_server"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8,<10",
+]
