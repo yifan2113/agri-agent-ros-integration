@@ -1,0 +1,15 @@
+# Copy this entry into the MacBook Harness cordis.yml plugin list.
+- id: mcp-agri-ros
+  name: '@deepseek-ai/dsh-mcp-client'
+  config:
+    serverName: agri_ros
+    transport: streamable-http
+    # Replace this placeholder with the server's current Tailscale IPv4 address.
+    url: http://<SERVER_TAILSCALE_IP>:8000/mcp
+    toolCallTimeoutMs: 10000
+    failOnStartupError: true
+    reconnect:
+      enabled: true
+      initialDelayMs: 500
+      maxDelayMs: 10000
+      maxAttempts: 10

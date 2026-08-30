@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from ipaddress import ip_address, ip_network
 from typing import Any
 
 from mcp.server import MCPServer
@@ -17,11 +18,44 @@ mcp = MCPServer(
     title="Agri_ROS Safe Tools",
     description="Read-only MCP facade for ROS Noetic and Agri_ROS.",
     instructions=(
-        "Stage 3 is status-only. These tools never publish ROS topics, start launch "
+        "Stages 3 and 4 are status-only. These tools never publish ROS topics, start launch "
         "files, or control navigation, SLAM, motors, sensors, or actuators."
     ),
     version=__version__,
 )
+
+TAILSCALE_IPV4_NETWORK = ip_network("100.64.0.0/10")
+
+
+def allowed_http_hosts() -> list[str]:
+    """Build the DNS-rebinding allowlist for local and optional Tailscale access."""
+    allowed = ["127.0.0.1:*", "localhost:*"]
+    forwarded_host = os.environ.get("AGRI_MCP_TAILSCALE_HOST")
+    if forwarded_host is None:
+        return allowed
+
+    try:
+        forwarded_ip = ip_address(forwarded_host)
+    except ValueError as exc:
+        raise ValueError("AGRI_MCP_TAILSCALE_HOST must be an IPv4 address") from exc
+    if forwarded_ip.version != 4 or forwarded_ip not in TAILSCALE_IPV4_NETWORK:
+        raise ValueError("AGRI_MCP_TAILSCALE_HOST must be inside 100.64.0.0/10")
+
+    allowed.append(f"{forwarded_ip}:*")
+    return allowed
+
+
+def validate_bind_host(host: str) -> None:
+    """Permit localhost, or the exact validated Tailscale host for stage 4."""
+    if host in {"127.0.0.1", "localhost"}:
+        return
+
+    tailscale_host = os.environ.get("AGRI_MCP_TAILSCALE_HOST")
+    if tailscale_host is None or host != tailscale_host:
+        raise RuntimeError(
+            "MCP may bind only to localhost or the configured Tailscale address."
+        )
+    allowed_http_hosts()
 
 @mcp.tool(structured_output=True)
 async def ros_check_online() -> dict[str, Any]:
@@ -49,8 +83,7 @@ async def get_robot_status() -> dict[str, Any]:
 
 def main() -> None:
     host = os.environ.get("AGRI_MCP_HOST", "127.0.0.1")
-    if host not in {"127.0.0.1", "localhost"}:
-        raise RuntimeError("Stage 3 may bind only to localhost.")
+    validate_bind_host(host)
 
     port = int(os.environ.get("AGRI_MCP_PORT", "8000"))
     if not 1 <= port <= 65535:
@@ -58,7 +91,7 @@ def main() -> None:
 
     transport_security = TransportSecuritySettings(
         enable_dns_rebinding_protection=True,
-        allowed_hosts=["127.0.0.1:*", "localhost:*"],
+        allowed_hosts=allowed_http_hosts(),
         allowed_origins=[],
     )
     mcp.run(

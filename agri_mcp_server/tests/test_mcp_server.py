@@ -4,7 +4,7 @@ from mcp import Client
 import pytest
 
 import agri_mcp_server.server as server_module
-from agri_mcp_server.server import mcp
+from agri_mcp_server.server import allowed_http_hosts, mcp, validate_bind_host
 
 
 EXPECTED_TOOLS = {
@@ -35,3 +35,23 @@ def test_in_process_mcp_discovery_and_call(
             assert isinstance(result.structured_content["online"], bool)
 
     asyncio.run(scenario())
+
+
+def test_tailscale_host_allowlist(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("AGRI_MCP_TAILSCALE_HOST", "100.64.0.10")
+    assert "100.64.0.10:*" in allowed_http_hosts()
+
+    monkeypatch.setenv("AGRI_MCP_TAILSCALE_HOST", "192.0.2.10")
+    with pytest.raises(ValueError, match="100.64.0.0/10"):
+        allowed_http_hosts()
+
+
+def test_bind_host_is_local_or_exact_tailscale_ip(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    validate_bind_host("127.0.0.1")
+
+    monkeypatch.setenv("AGRI_MCP_TAILSCALE_HOST", "100.64.0.10")
+    validate_bind_host("100.64.0.10")
+    with pytest.raises(RuntimeError, match="configured Tailscale"):
+        validate_bind_host("0.0.0.0")
