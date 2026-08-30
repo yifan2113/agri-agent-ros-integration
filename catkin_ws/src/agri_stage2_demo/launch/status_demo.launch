@@ -1,0 +1,9 @@
+<launch>
+  <node
+    pkg="agri_stage2_demo"
+    type="status_server.py"
+    name="agri_stage2_status_server"
+    output="screen"
+    required="true"
+  />
+</launch>

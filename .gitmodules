@@ -1,0 +1,3 @@
+[submodule "catkin_ws/src/Agri_ROS"]
+	path = catkin_ws/src/Agri_ROS
+	url = https://github.com/Fontainebleau2021/Agri_ROS.git

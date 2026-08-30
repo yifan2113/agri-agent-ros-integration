@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>agri_stage2_demo</name>
+  <version>0.1.0</version>
+  <description>Safe ROS-only status service for the stage 2 Agri_ROS integration demo.</description>
+
+  <maintainer email="yifan@example.com">yifan</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>agr_service</depend>
+  <depend>rospy</depend>
+
+  <export/>
+</package>

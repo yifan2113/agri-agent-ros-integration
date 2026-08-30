@@ -1,0 +1,38 @@
+# catkin generated state
+/catkin_ws/build/
+/catkin_ws/devel/
+/catkin_ws/install/
+/catkin_ws/logs/
+/catkin_ws/.catkin_tools/
+/catkin_ws/src/CMakeLists.txt
+
+# Python environments and caches
+/.venv/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.py[cod]
+
+# Editors and OS metadata
+.DS_Store
+.idea/
+.vscode/
+*~
+
+# Runtime state and secrets
+.env
+.env.*
+!.env.example
+*.token
+*.secret
+*.pem
+/runtime/
+
+# Datasets and generated artifacts
+/data/*
+!/data/README.md
+*.bag
+*.db3
+*.pcd
+*.las
+*.laz
