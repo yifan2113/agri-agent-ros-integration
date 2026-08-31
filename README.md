@@ -278,12 +278,9 @@ pnpm dsh web --patch scratch-plugin/cordis.stage4.yml
 自然语言 -> Harness -> 远程 MCP Server -> ROS service -> 结果返回模型
 ```
 
-## 自动化测试说明
+## 测试
 
-这里的“测试”指 `agri_mcp_server/tests/` 中使用 `pytest` 编写的自动化代码测试，
-不是五个实验阶段，也不是对真实机器人进行五次现场测试。
-
-当前共包含 5 个测试用例：
+`agri_mcp_server/tests/` 当前包含 5 个 `pytest` 测试用例：
 
 | 测试内容 | 验证目标 |
 | --- | --- |
@@ -313,11 +310,6 @@ AGRI_CATKIN_WS=<BUILT_CATKIN_WORKSPACE> \
 .....                                                                    [100%]
 5 passed
 ```
-
-“5 项测试全部通过”表示上述五种代码行为均符合断言，没有发现失败；它证明的是
-MCP 工具注册、白名单、网络绑定校验和 ROS 状态错误处理符合预期，不证明真实
-传感器、建图、导航或底盘控制已经通过测试。阶段 4 的跨机器链路另外通过 MacBook
-Harness 实际调用和服务器请求日志进行了人工端到端验收。
 
 ## 安全边界
 
